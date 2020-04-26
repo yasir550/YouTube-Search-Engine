@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://kit.fontawesome.com/4e5af276e1.js" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
+    <title>YouTube Search</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- container start -->
+    <div class="container">
+       
+        <!-- header start -->
+      <header>
+
+           <div class="logo">
+
+            <i class="fas fa-bars"></i>
+            <img src="logo.png" alt="">
+           </div>
+          
+           <div class="search-bar">
+               <input type="text" id="search" placeholder="Search">
+               <button type="button" id="btn"><i class="fas fa-search"></i></button>
+           </div>
+          
+           <!-- icons -->
+           <div class="icons">
+
+            <i class="fas fa-video"></i>
+            <i class="fas fa-th"></i>
+            <i class="fas fa-bell"></i>
+            <i class="fas fa-circle"></i>
+           </div>
+           
+      </header>
+      <!-- header end -->
+
+      <!-- main start -->
+      <div class="main">
+          
+        <!-- sidebar -->
+          <div class="sidebar">
+
+            <div class="sidebar-top">
+              <span><i class="fas fa-home"></i><p>Home</p></span>
+              
+              <span><i class="fas fa-fire"></i><p>Trendings</p></span>
+
+              <span><i class="fab fa-youtube"></i><p>Subscriptions</p></span>
+            </div>
+
+            <div class="sidebar-middle">
+
+              <span><i class="fas fa-play"></i><p>Library</p></span>
+              
+              <span><i class="fas fa-history"></i><p>History</p></span>
+
+              <span><i class="far fa-play-circle"></i><p>Your Videos</p></span>
+
+              <span><i class="fas fa-clock"></i><p>Watch Later</p></span>
+              <span><i class="fas fa-thumbs-up"></i><p>Liked Videos</p></span>
+            </div>
+
+            <div class="sidebar-last">
+
+              <h3>Subscriptions</h3>
+
+              <span><i class="fas fa-circle"></i><p>Looper</p></span>
+              <span><i class="fas fa-circle"></i><p>The CW Network</p></span>
+              <span><i class="fas fa-circle"></i><p>Red Chilies</p></span>
+              <span><i class="fas fa-circle"></i><p>Junaid Akram</p></span>
+              <span><i class="fas fa-circle"></i><p>Academind</p></span>
+              <span><i class="fas fa-circle"></i><p>Some</p></span>
+            </div>
+          </div>
+          <!-- sidebar -->
+           
+          <!-- main-content -->
+          <div class="main-content">
+
+            <div class="filter">
+              <i class="fas fa-bars"></i>
+                <h5>FILTER</h5>
+            </div>
+
+            <div class="iframe_holder">
+
+              <iframe src="" frameborder="0" width="70%" height="400" allow="autoplay"></iframe>
+
+              <span>X</span>
+            </div>
+
+            <!-- Show all videos -->
+            <div class="all-videos">
+              
+
+            </div>
+
+            
+          </div>
+
+      </div>
+      <!-- main end -->
+    </div>
+    <!-- container end -->
+
+    <!-- script -->
+    <script src="jquery-3.4.1.min.js"></script>
+
+    <script>
+
+        // method to load videos on button click
+         $("#btn").on("click", function(){
+            
+            let search = $("#search").val();
+            $(".all-videos").html('')
+            $("#search").val('');
+             var exp = new RegExp(search,"i")
+             
+            //  ajax method to retrieve videos
+             $.ajax({
+                      url:"https://www.googleapis.com/youtube/v3/search",
+                      method:"GET",
+                      data:{
+                        q:search,
+                        part:"snippet",
+                        key:"AIzaSyDMQTjNR7Ce8RxWsPwXZC6x-y90a5Z216U",
+                        maxResults:30
+                 },
+                  // function to display videos and its content in specified area in the document
+                 success:function(result, status)
+                 {
+                     console.log(result)
+                     let videos  = result.items
+
+                     $(videos).each(function(i)
+                     {
+                    
+                        if(videos[i].snippet.title.search(exp) != -1 && search != ''){
+                            console.log(videos)
+
+                         let thumb = videos[i].snippet.thumbnails.medium.url
+                         let _h3 = videos[i].snippet.title
+                         let _desc = videos[i].snippet.description
+                         let _date = videos[i].snippet.publishedAt
+                         let channel_title = videos[i].snippet.channelTitle
+                         let id = videos[i].id.videoId
+                         $(".all-videos").append(`
+                      <div class="result-data">
+
+                        <div id="${id}" class="thumbnail">  <img src="${thumb}" alt=""> </div>
+                        
+                        <div class="video-info">
+
+                         
+                          <div class="video-title"><h3>${_h3}</h3></div>
+                         
+                         <div class="date-published"><p>${channel_title}</p> <p class="dt">${_date}</p></div>
+                         
+                          <div class="desc"><h5>${_desc}</h5></div>
+                        </div>
+                    
+                       </div>
+                      `)}
+                    })
+                      
+                      // method to play video that has been clicked
+                     $(".thumbnail").on("click", function(e)
+                      {
+                        $(".iframe_holder").show();
+                        let video_id = this.id;
+                        
+                        let url = "http://www.youtube.com/embed/" + video_id;
+                        $('.iframe_holder').css('display','block');
+                        $('.iframe_holder iframe').attr("src", url);
+                        
+                        console.log(url);
+                        
+                      })
+                      
+                 }
+         })
+         
+        })
+
+        $(".iframe_holder span").on("click", function()
+        {
+          $(".iframe_holder").hide();
+        })
+
+        
+        
+    </script>
+    <!-- script -->
+</body>
+</html>
